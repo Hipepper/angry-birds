@@ -47,8 +47,8 @@
 
         var Particle = function (id, x, y, sx, sy) { 
             if (sx === 0) sx = 2;
-            var cx = (id % 4) * cwidth;
-            var cy = Math.floor(id / 4) * cheight;
+            var cx = (id % 5) * cwidth;
+            var cy = Math.floor(id / 5) * cheight;
             this.update = function () {
                 x += sx;
                 y += sy;
