@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"> <!--可以在移动端使用，全填充-->
+    <title>愤怒的鸟！</title>
+    <style type="text/css">
+        body {
+            color: #fffafa;
+            background-color: #000000;
+            margin: 0px;
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+            image-rendering: pixelated;  /*设置canvas图像属性*/
+        }
+    </style>
+</head>
+
+<body>  <!--全部使用动态建立html元素-->
+    <script>
+        var info = document.createElement('div');
+        info.style.position = 'absolute';
+        info.style.top = '10px';   //字体属性向上留10px大小
+        info.style.width = '100%';
+        info.style.fontFamily = 'serif';   //默认宋体显示
+        info.style.textAlign = 'center';   //字体居中显示
+        info.innerHTML = '解压鸟';
+        document.body.appendChild(info);
+
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.style.position = 'absolute';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        document.body.appendChild(canvas);
+        
+        var image = document.createElement('img');   //创建一个img元素
+           image.src="绘图2.png"
+
+        var id = 1;
+        var cwidth =1033/8 ,cwidthhalf = cwidth / 2;     //设置图片宽度和高度
+        var cheight =650/5, cheighthalf = cheight / 2;
+        var particles = [];
+
+        var Particle = function (id, x, y, sx, sy) { 
+            if (sx === 0) sx = 2;
+            var cx = (id % 4) * cwidth;
+            var cy = Math.floor(id / 4) * cheight;
+            this.update = function () {
+                x += sx;
+                y += sy;
+                if (x < (-cwidthhalf) || x > (canvas.width + cwidthhalf)) {
+                    var index = particles.indexOf(this);
+                    particles.splice(index, 1);
+                    return false;
+                }
+                if (y > canvas.height - cheighthalf) {
+                    y = canvas.height - cheighthalf;
+                    sy = -sy * 0.85;
+                }
+                sy += 0.48;
+                ctx.drawImage(image, cx, cy, cwidth, cheight, Math.floor(x - cwidthhalf), Math.floor(y -
+                    cheighthalf), cwidth, cheight);
+                return true;
+            }
+        }
+
+        var throwhuaji = function (x, y) {      //扔滑稽函数,参数是用来接受鼠标位置的
+            id > 0 ? id-- : id = 51;
+            var particle = new Particle(id, x, y, Math.floor(Math.random() * 6 - 3) * 2, -Math.random() * 16);
+            particles.push(particle);
+        }
+        
+        //开始定义鼠标事件
+        document.addEventListener('mousedown', function (event) {
+            event.preventDefault();
+            document.addEventListener('mousemove', shubiao_move, false);
+        });
+
+        document.addEventListener('mouseup', function (event) {
+            event.preventDefault();
+            throwhuaji(event.clientX, event.clientY);     //松开后传入参数，开始扔滑稽
+            document.removeEventListener('mousemove', shubiao_move, false);  //要消除鼠标点击事件！
+        }, false);
+
+        function shubiao_move(event) {  
+            event.preventDefault();
+            throwhuaji(event.clientX, event.clientY);
+        }
+          
+        //针对移动端事件
+        document.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            for (var i = 0; i < event.changedTouches.length; i++) {
+                throwhuaji(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+            }
+        }, false);
+        document.addEventListener('touchmove', function (event) {
+            event.preventDefault();
+            for (var i = 0; i < event.touches.length; i++) {
+                throwhuaji(event.touches[i].pageX, event.touches[i].pageY);
+            }
+        }, false);
+
+        function animate() {
+            var i = 0, l = particles.length;
+            while (i < l) {
+                particles[i].update() ? i++ : l--;
+            }
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    </script>
+    
+</body>
+
+</html>
